@@ -90,15 +90,15 @@ function love.load()
 
     -- initialize our player paddles; make them global so that they can be
     -- detected by other functions and modules
-    player1 = Paddle(10, 30, 5, 20)
-    player2 = Paddle(VIRTUAL_WIDTH - 10, VIRTUAL_HEIGHT - 30, 5, 20)
+    player = Paddle(10, 30, 5, 20)
+    ai = Paddle(VIRTUAL_WIDTH - 10, VIRTUAL_HEIGHT - 30, 5, 20)
 
     -- place a ball in the middle of the screen
     ball = Ball(VIRTUAL_WIDTH / 2 - 2, VIRTUAL_HEIGHT / 2 - 2, 4, 4)
 
     -- initialize score variables
-    player1Score = 0
-    player2Score = 0
+    playerScore = 0
+    aiScore = 0
 
     -- either going to be 1 or 2; whomever is scored on gets to serve the
     -- following turn
@@ -148,9 +148,9 @@ function love.update(dt)
         -- detect ball collision with paddles, reversing dx if true and
         -- slightly increasing it, then altering the dy based on the position
         -- at which it collided, then playing a sound effect
-        if ball:collides(player1) then
+        if ball:collides(player) then
             ball.dx = -ball.dx * 1.03
-            ball.x = player1.x + 5
+            ball.x = player.x + 5
 
             -- keep velocity going in the same direction, but randomize it
             if ball.dy < 0 then
@@ -161,9 +161,9 @@ function love.update(dt)
 
             sounds['paddle_hit']:play()
         end
-        if ball:collides(player2) then
+        if ball:collides(ai) then
             ball.dx = -ball.dx * 1.03
-            ball.x = player2.x - 4
+            ball.x = ai.x - 4
 
             -- keep velocity going in the same direction, but randomize it
             if ball.dy < 0 then
@@ -194,12 +194,12 @@ function love.update(dt)
         -- and update the score and serving player
         if ball.x < 0 then
             servingPlayer = 1
-            player2Score = player2Score + 1
+            aiScore = aiScore + 1
             sounds['score']:play()
 
             -- if we've reached a score of 10, the game is over; set the
             -- state to done so we can show the victory message
-            if player2Score == 10 then
+            if aiScore == 10 then
                 winningPlayer = 2
                 gameState = 'done'
             else
@@ -213,12 +213,12 @@ function love.update(dt)
         -- and update the score and serving player
         if ball.x > VIRTUAL_WIDTH then
             servingPlayer = 2
-            player1Score = player1Score + 1
+            playerScore = playerScore + 1
             sounds['score']:play()
 
             -- if we've reached a score of 10, the game is over; set the
             -- state to done so we can show the victory message
-            if player1Score == 10 then
+            if playerScore == 10 then
                 winningPlayer = 1
                 gameState = 'done'
             else
@@ -232,22 +232,35 @@ function love.update(dt)
     --
     -- paddles can move no matter what state we're in
     --
-    -- player 1
+    -- player
     if love.keyboard.isDown('w') then
-        player1.dy = -PADDLE_SPEED
+        player.dy = -PADDLE_SPEED
     elseif love.keyboard.isDown('s') then
-        player1.dy = PADDLE_SPEED
+        player.dy = PADDLE_SPEED
     else
-        player1.dy = 0
+        player.dy = 0
     end
 
-    -- player 2
-    if love.keyboard.isDown('up') then
-        player2.dy = -PADDLE_SPEED
-    elseif love.keyboard.isDown('down') then
-        player2.dy = PADDLE_SPEED
-    else
-        player2.dy = 0
+    -- ai
+    if gameState == 'play' then
+        if ball.dx > 0 then
+            framesToReachBorder = (VIRTUAL_WIDTH - ball.x) / ball.dx
+            finalYPosition = ball.y + (ball.dy * framesToReachBorder)
+
+            if finalYPosition < 0 then
+                finalYPosition = -finalYPosition
+            elseif finalYPosition > VIRTUAL_HEIGHT then
+                finalYPosition = VIRTUAL_HEIGHT + (VIRTUAL_HEIGHT - finalYPosition)
+            end
+
+            if finalYPosition > ai.y and finalYPosition < ai.y + ai.height then
+                ai.dy = 0
+            elseif finalYPosition < ai.y then
+                ai.dy = -PADDLE_SPEED
+            elseif finalYPosition > ai.y then
+                ai.dy = PADDLE_SPEED
+            end
+        end
     end
 
     -- update our ball based on its DX and DY only if we're in play state;
@@ -256,8 +269,8 @@ function love.update(dt)
         ball:update(dt)
     end
 
-    player1:update(dt)
-    player2:update(dt)
+    player:update(dt)
+    ai:update(dt)
 end
 
 --[[
@@ -286,8 +299,8 @@ function love.keypressed(key)
             ball:reset()
 
             -- reset scores to 0
-            player1Score = 0
-            player2Score = 0
+            playerScore = 0
+            aiScore = 0
 
             -- decide serving player as the opposite of who won
             if winningPlayer == 1 then
@@ -335,8 +348,8 @@ function love.draw()
     -- show the score before ball is rendered so it can move over the text
     displayScore()
     
-    player1:render()
-    player2:render()
+    player:render()
+    ai:render()
     ball:render()
 
     -- display FPS for debugging; simply comment out to remove
@@ -352,9 +365,9 @@ end
 function displayScore()
     -- score display
     love.graphics.setFont(scoreFont)
-    love.graphics.print(tostring(player1Score), VIRTUAL_WIDTH / 2 - 50,
+    love.graphics.print(tostring(playerScore), VIRTUAL_WIDTH / 2 - 50,
         VIRTUAL_HEIGHT / 3)
-    love.graphics.print(tostring(player2Score), VIRTUAL_WIDTH / 2 + 30,
+    love.graphics.print(tostring(aiScore), VIRTUAL_WIDTH / 2 + 30,
         VIRTUAL_HEIGHT / 3)
 end
 
