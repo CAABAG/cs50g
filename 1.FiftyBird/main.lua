@@ -57,8 +57,6 @@ local backgroundScroll = 0
 local ground = love.graphics.newImage('ground.png')
 local groundScroll = 0
 
-local paused = false
-
 local BACKGROUND_SCROLL_SPEED = 30
 local GROUND_SCROLL_SPEED = 60
 
@@ -74,6 +72,9 @@ function love.load()
     -- app window title
     love.window.setTitle('Fifty Bird')
 
+    -- keep track of the pause state
+    paused = false
+
     -- initialize our nice-looking retro text fonts
     smallFont = love.graphics.newFont('font.ttf', 8)
     mediumFont = love.graphics.newFont('flappy.ttf', 14)
@@ -87,6 +88,7 @@ function love.load()
         ['explosion'] = love.audio.newSource('explosion.wav', 'static'),
         ['hurt'] = love.audio.newSource('hurt.wav', 'static'),
         ['score'] = love.audio.newSource('score.wav', 'static'),
+        ['pause'] = love.audio.newSource('pause.wav', 'static'),
 
         -- https://freesound.org/people/xsgianni/sounds/388079/
         ['music'] = love.audio.newSource('marios_way.mp3', 'static')
@@ -130,15 +132,6 @@ function love.keypressed(key)
     if key == 'escape' then
         love.event.quit()
     end
-
-    if key == 'p' then
-        paused = paused == false
-        if paused then
-            sounds['music']:pause()
-        else
-            sounds['music']:play()
-        end
-    end
 end
 
 --[[
@@ -165,15 +158,11 @@ function love.mouse.wasPressed(button)
 end
 
 function love.update(dt)
-    if paused then
-        love.keyboard.keysPressed = {}
-        love.mouse.buttonsPressed = {}
-        return
+    if not paused then
+       -- scroll our background and ground, looping back to 0 after a certain amount
+        backgroundScroll = (backgroundScroll + BACKGROUND_SCROLL_SPEED * dt) % BACKGROUND_LOOPING_POINT
+        groundScroll = (groundScroll + GROUND_SCROLL_SPEED * dt) % VIRTUAL_WIDTH 
     end
-
-    -- scroll our background and ground, looping back to 0 after a certain amount
-    backgroundScroll = (backgroundScroll + BACKGROUND_SCROLL_SPEED * dt) % BACKGROUND_LOOPING_POINT
-    groundScroll = (groundScroll + GROUND_SCROLL_SPEED * dt) % VIRTUAL_WIDTH
 
     gStateMachine:update(dt)
 
