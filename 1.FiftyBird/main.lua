@@ -57,6 +57,8 @@ local backgroundScroll = 0
 local ground = love.graphics.newImage('ground.png')
 local groundScroll = 0
 
+local paused = false
+
 local BACKGROUND_SCROLL_SPEED = 30
 local GROUND_SCROLL_SPEED = 60
 
@@ -128,6 +130,15 @@ function love.keypressed(key)
     if key == 'escape' then
         love.event.quit()
     end
+
+    if key == 'p' then
+        paused = paused == false
+        if paused then
+            sounds['music']:pause()
+        else
+            sounds['music']:play()
+        end
+    end
 end
 
 --[[
@@ -154,6 +165,12 @@ function love.mouse.wasPressed(button)
 end
 
 function love.update(dt)
+    if paused then
+        love.keyboard.keysPressed = {}
+        love.mouse.buttonsPressed = {}
+        return
+    end
+
     -- scroll our background and ground, looping back to 0 after a certain amount
     backgroundScroll = (backgroundScroll + BACKGROUND_SCROLL_SPEED * dt) % BACKGROUND_LOOPING_POINT
     groundScroll = (groundScroll + GROUND_SCROLL_SPEED * dt) % VIRTUAL_WIDTH
