@@ -125,3 +125,23 @@ function GenerateQuadsBalls(atlas)
 
     return quads
 end
+
+--[[
+    This function provides all ten quads of powerups located at the very
+    bottom of the breakout atlas.
+]]
+function GenerateQuadsPowerups(atlas)
+    local x = 0
+    local y = 192
+
+    local counter = 1
+    local quads = {}
+
+    for i = 0, 10 do
+        quads[counter] = love.graphics.newQuad(x, y, 16, 16, atlas:getDimensions())
+        x = x + 16
+        counter = counter + 1
+    end
+
+    return quads
+end
