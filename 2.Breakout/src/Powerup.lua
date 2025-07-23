@@ -16,7 +16,7 @@ Powerup = Class()
 -- a constant value by which we're going to move the powerup each frame
 local GRAVITY = 30
 
-function Powerup:init(x, y, skin)
+function Powerup:init(x, y, skin, inPlay)
     -- initial coordinates to match the place of the brick, which provides the powerup
     self.x = x
     self.y = y
@@ -29,7 +29,7 @@ function Powerup:init(x, y, skin)
     self.skin = skin
 
     -- a variable to track whether the powerup needs to be updated or rendered
-    self.inPlay = true
+    self.inPlay = inPlay
 end
 
 --[[

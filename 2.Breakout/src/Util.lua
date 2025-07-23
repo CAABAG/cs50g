@@ -49,6 +49,14 @@ function table.slice(tbl, first, last, step)
     return sliced
 end
 
+function table.size(tbl)
+    local count = 0
+    for i, element in pairs(tbl) do
+        count = count + 1
+    end
+    return count
+end
+
 --[[
     This function is specifically made to piece out the bricks from the
     sprite sheet. Since the sprite sheet has non-uniform sprites within,
