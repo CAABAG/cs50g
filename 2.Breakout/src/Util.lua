@@ -49,6 +49,14 @@ function table.slice(tbl, first, last, step)
     return sliced
 end
 
+function table.size(tbl)
+    local count = 0
+    for i, element in pairs(tbl) do
+        count = count + 1
+    end
+    return count
+end
+
 --[[
     This function is specifically made to piece out the bricks from the
     sprite sheet. Since the sprite sheet has non-uniform sprites within,
@@ -120,6 +128,26 @@ function GenerateQuadsBalls(atlas)
     for i = 0, 2 do
         quads[counter] = love.graphics.newQuad(x, y, 8, 8, atlas:getDimensions())
         x = x + 8
+        counter = counter + 1
+    end
+
+    return quads
+end
+
+--[[
+    This function provides all ten quads of powerups located at the very
+    bottom of the breakout atlas.
+]]
+function GenerateQuadsPowerups(atlas)
+    local x = 0
+    local y = 192
+
+    local counter = 1
+    local quads = {}
+
+    for i = 0, 10 do
+        quads[counter] = love.graphics.newQuad(x, y, 16, 16, atlas:getDimensions())
+        x = x + 16
         counter = counter + 1
     end
 
