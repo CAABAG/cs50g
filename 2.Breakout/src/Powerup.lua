@@ -60,6 +60,10 @@ function Powerup:update(dt)
 
     -- shift the powerup down by a constant value
     self.y = self.y + (GRAVITY * dt)
+
+    if self.y > VIRTUAL_HEIGHT then
+        self.inPlay = false
+    end
 end
 
 function Powerup:render()
