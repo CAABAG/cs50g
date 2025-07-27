@@ -127,7 +127,7 @@ function PlayState:update(dt)
                     end
                 end
 
-                if not extraBallPowerupPresent then
+                if not extraBallPowerupPresent and math.random(1, 100) <= 15 then
                     table.insert(self.powerups, Powerup(brick.x, brick.y, POWERUP_EXTRA_BALL_SKIN, true))
                 end
 
