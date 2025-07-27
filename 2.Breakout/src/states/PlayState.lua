@@ -108,7 +108,7 @@ function PlayState:update(dt)
                 brick:hit()
 
                 if not self.powerup or not self.powerup.inPlay then
-                    if math.random(1, 100) <= 25 then
+                    if math.random(1, 100) <= 15 then
                         self.powerup = Powerup(brick.x, brick.y, POWERUP_EXTRA_BALL_SKIN, true)
                     end
                 end
