@@ -27,9 +27,6 @@ function Powerup:init(x, y, skin, inPlay)
 
     -- the skin from the powerup quads
     self.skin = skin
-
-    -- a variable to track whether the powerup needs to be updated or rendered
-    self.inPlay = inPlay
 end
 
 --[[
@@ -54,10 +51,6 @@ function Powerup:collides(target)
 end
 
 function Powerup:update(dt)
-    if not self.inPlay then
-        return
-    end
-
     -- shift the powerup down by a constant value
     self.y = self.y + (GRAVITY * dt)
 
@@ -67,10 +60,6 @@ function Powerup:update(dt)
 end
 
 function Powerup:render()
-    if not self.inPlay then
-        return
-    end
-
     -- gTexture is our global texture for all blocks
     -- gBallFrames is a table of quads mapping to each individual powerup skin in the texture
     love.graphics.draw(gTextures['main'], gFrames['powerups'][self.skin],

@@ -85,11 +85,12 @@ function PlayState:update(dt)
         end
     end
 
-    -- add extra ball on powerup acquire
+    -- handle powerup acquire
+    local powerupsToRemove = {}
     for p, powerup in pairs(self.powerups) do
-        if powerup.inPlay and powerup:collides(self.paddle) then
+        if powerup:collides(self.paddle) then
             if powerup.skin == POWERUP_EXTRA_BALL_SKIN then
-                powerup.inPlay = false
+                table.insert(powerupsToRemove, p)
 
                 local newBall = Ball(math.random(7))
                 newBall:reset()
@@ -99,6 +100,11 @@ function PlayState:update(dt)
                 table.insert(self.balls, newBall)
             end
         end
+    end
+
+    -- remove marked powerups
+    for p, powerup in pairs(powerupsToRemove) do
+        table.remove(self.powerups, powerup)
     end
 
     -- detect collision across all bricks with the ball
@@ -116,7 +122,7 @@ function PlayState:update(dt)
 
                 local extraBallPowerupPresent = false
                 for p, powerup in pairs(self.powerups) do
-                    if powerup.skin == POWERUP_EXTRA_BALL_SKIN and powerup.inPlay then
+                    if powerup.skin == POWERUP_EXTRA_BALL_SKIN then
                         extraBallPowerupPresent = true
                     end
                 end
