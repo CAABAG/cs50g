@@ -110,7 +110,16 @@ function LevelMaker.createMap(level)
             if not alternatePattern then
                 b.color = solidColor
                 b.tier = solidTier
-            end 
+            end
+
+            -- if we're over level 2 we have a 1% chance to generate a locked brick
+            -- make tier 4 a locked brick tier
+            if level > 2 then
+                if math.random(1, 100) == 1 then
+                    b.tier = 4
+                    b.color = 5
+                end
+            end
 
             table.insert(bricks, b)
 

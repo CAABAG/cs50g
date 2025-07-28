@@ -17,6 +17,7 @@
 PlayState = Class{__includes = BaseState}
 
 local POWERUP_EXTRA_BALL_SKIN = 9
+local POWERUP_KEY_SKIN = 10
 
 --[[
     We initialize what's in our PlayState via a state table that we pass between
@@ -30,13 +31,20 @@ function PlayState:enter(params)
     self.highScores = params.highScores
     self.balls = {params.ball}
     self.level = params.level
-    self.powerup = Powerup(0, 0, 0, false)
+    self.powerups = {}
+    self.hasLockedBrick = false
 
     self.recoverPoints = 5000
 
     -- give ball random starting velocity
     self.balls[1].dx = math.random(-200, 200)
     self.balls[1].dy = math.random(-50, -60)
+
+    for k, brick in pairs(self.bricks) do
+        if brick.tier == 4 then
+            self.hasLockedBrick = true
+        end
+    end
 end
 
 function PlayState:update(dt)
@@ -55,7 +63,10 @@ function PlayState:update(dt)
 
     -- update positions based on velocity
     self.paddle:update(dt)
-    self.powerup:update(dt)
+
+    for i, powerup in pairs(self.powerups) do
+        powerup:update(dt)
+    end
 
     for i, ball in pairs(self.balls) do
         ball:update(dt)
@@ -82,16 +93,42 @@ function PlayState:update(dt)
         end
     end
 
-    -- add extra ball on powerup acquire
-    if self.powerup.inPlay and self.powerup:collides(self.paddle) then
-        self.powerup.inPlay = false
+    -- handle powerup acquire
+    local powerupsToRemove = {}
+    for p, powerup in pairs(self.powerups) do
+        if powerup:collides(self.paddle) then
+            table.insert(powerupsToRemove, p)
+            if powerup.skin == POWERUP_EXTRA_BALL_SKIN then
+                local newBall = Ball(math.random(7))
+                newBall:reset()
+                newBall.dx = math.random(-200, 200)
+                newBall.dy = math.random(-50, -60)
 
-        local newBall = Ball(math.random(7))
-        newBall:reset()
-        newBall.dx = math.random(-200, 200)
-        newBall.dy = math.random(-50, -60)
+                table.insert(self.balls, newBall)
+            elseif powerup.skin == POWERUP_KEY_SKIN then
+                for k, brick in pairs(self.bricks) do
+                    if brick.tier == 4 then
+                        brick.unlocked = true
+                    end
+                end
+                self.hasLockedBrick = false
+            end
+        end
+    end
 
-        table.insert(self.balls, newBall)
+    -- remove marked powerups
+    for p, powerup in pairs(powerupsToRemove) do
+        table.remove(self.powerups, powerup)
+    end
+
+    -- check if we're not on the last locked brick if the level has one
+    local bricksCounter = 0
+    if self.hasLockedBrick then
+        for k, brick in pairs(self.bricks) do
+            if brick.inPlay then
+                bricksCounter = bricksCounter + 1
+            end
+        end
     end
 
     -- detect collision across all bricks with the ball
@@ -107,10 +144,20 @@ function PlayState:update(dt)
                 -- trigger the brick's hit function, which removes it from play
                 brick:hit()
 
-                if not self.powerup or not self.powerup.inPlay then
-                    if math.random(1, 100) <= 15 then
-                        self.powerup = Powerup(brick.x, brick.y, POWERUP_EXTRA_BALL_SKIN, true)
+                local extraBallPowerupPresent = false
+                for p, powerup in pairs(self.powerups) do
+                    if powerup.skin == POWERUP_EXTRA_BALL_SKIN then
+                        extraBallPowerupPresent = true
                     end
+                end
+
+                -- spawn a powerup if conditions or a chance is fulfilled
+                if self.hasLockedBrick then
+                    if (bricksCounter > 1 and math.random(1, 10) == 1) or bricksCounter == 1 then
+                        table.insert(self.powerups, Powerup(brick.x, brick.y, POWERUP_KEY_SKIN, true))
+                    end
+                elseif not extraBallPowerupPresent and math.random(1, 100) <= 15 then
+                    table.insert(self.powerups, Powerup(brick.x, brick.y, POWERUP_EXTRA_BALL_SKIN, true))
                 end
 
                 -- if we have enough points, recover a point of health
@@ -259,7 +306,10 @@ function PlayState:render()
     end
 
     self.paddle:render()
-    self.powerup:render()
+
+    for p, powerup in pairs(self.powerups) do
+        powerup:render()
+    end
 
     for i, ball in pairs(self.balls) do
         ball:render()
