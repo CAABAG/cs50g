@@ -17,6 +17,7 @@
 PlayState = Class{__includes = BaseState}
 
 local POWERUP_EXTRA_BALL_SKIN = 9
+local POWERUP_KEY_SKIN = 10
 
 --[[
     We initialize what's in our PlayState via a state table that we pass between
@@ -31,12 +32,19 @@ function PlayState:enter(params)
     self.balls = {params.ball}
     self.level = params.level
     self.powerups = {}
+    self.hasLockedBrick = false
 
     self.recoverPoints = 5000
 
     -- give ball random starting velocity
     self.balls[1].dx = math.random(-200, 200)
     self.balls[1].dy = math.random(-50, -60)
+
+    for k, brick in pairs(self.bricks) do
+        if brick.tier == 4 then
+            self.hasLockedBrick = true
+        end
+    end
 end
 
 function PlayState:update(dt)
@@ -89,15 +97,21 @@ function PlayState:update(dt)
     local powerupsToRemove = {}
     for p, powerup in pairs(self.powerups) do
         if powerup:collides(self.paddle) then
+            table.insert(powerupsToRemove, p)
             if powerup.skin == POWERUP_EXTRA_BALL_SKIN then
-                table.insert(powerupsToRemove, p)
-
                 local newBall = Ball(math.random(7))
                 newBall:reset()
                 newBall.dx = math.random(-200, 200)
                 newBall.dy = math.random(-50, -60)
 
                 table.insert(self.balls, newBall)
+            elseif powerup.skin == POWERUP_KEY_SKIN then
+                for k, brick in pairs(self.bricks) do
+                    if brick.tier == 4 then
+                        brick.unlocked = true
+                    end
+                end
+                self.hasLockedBrick = false
             end
         end
     end
@@ -105,6 +119,16 @@ function PlayState:update(dt)
     -- remove marked powerups
     for p, powerup in pairs(powerupsToRemove) do
         table.remove(self.powerups, powerup)
+    end
+
+    -- check if we're not on the last locked brick if the level has one
+    local bricksCounter = 0
+    if self.hasLockedBrick then
+        for k, brick in pairs(self.bricks) do
+            if brick.inPlay then
+                bricksCounter = bricksCounter + 1
+            end
+        end
     end
 
     -- detect collision across all bricks with the ball
@@ -127,7 +151,12 @@ function PlayState:update(dt)
                     end
                 end
 
-                if not extraBallPowerupPresent and math.random(1, 100) <= 15 then
+                -- spawn a powerup if conditions or a chance is fulfilled
+                if self.hasLockedBrick then
+                    if (bricksCounter > 1 and math.random(1, 10) == 1) or bricksCounter == 1 then
+                        table.insert(self.powerups, Powerup(brick.x, brick.y, POWERUP_KEY_SKIN, true))
+                    end
+                elseif not extraBallPowerupPresent and math.random(1, 100) <= 15 then
                     table.insert(self.powerups, Powerup(brick.x, brick.y, POWERUP_EXTRA_BALL_SKIN, true))
                 end
 

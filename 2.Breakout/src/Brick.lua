@@ -54,6 +54,7 @@ function Brick:init(x, y)
     -- used for coloring and score calculation
     self.tier = 0
     self.color = 1
+    self.unlocked = false
     
     self.x = x
     self.y = y
@@ -104,9 +105,14 @@ function Brick:hit()
     gSounds['brick-hit-2']:stop()
     gSounds['brick-hit-2']:play()
 
+    -- tier 4 is for a locked brick
+    if self.tier == 4 then
+        if self.unlocked then
+            self.inPlay = false
+        end
     -- if we're at a higher tier than the base, we need to go down a tier
     -- if we're already at the lowest color, else just go down a color
-    if self.tier > 0 then
+    elseif self.tier > 0 then
         if self.color == 1 then
             self.tier = self.tier - 1
             self.color = 5
@@ -135,11 +141,19 @@ end
 
 function Brick:render()
     if self.inPlay then
-        love.graphics.draw(gTextures['main'], 
-            -- multiply color by 4 (-1) to get our color offset, then add tier to that
-            -- to draw the correct tier and color brick onto the screen
-            gFrames['bricks'][1 + ((self.color - 1) * 4) + self.tier],
-            self.x, self.y)
+        if self.tier == 4 then
+            if not self.unlocked then
+                love.graphics.draw(gTextures['main'], gFrames['locked_brick'][2], self.x, self.y)
+            else
+                love.graphics.draw(gTextures['main'], gFrames['locked_brick'][1], self.x, self.y)
+            end
+        else
+            love.graphics.draw(gTextures['main'], 
+                -- multiply color by 4 (-1) to get our color offset, then add tier to that
+                -- to draw the correct tier and color brick onto the screen
+                gFrames['bricks'][1 + ((self.color - 1) * 4) + self.tier],
+                self.x, self.y)
+        end
     end
 end
 
