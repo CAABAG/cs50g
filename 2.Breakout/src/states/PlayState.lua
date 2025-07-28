@@ -167,8 +167,9 @@ function PlayState:update(dt)
 
                     -- can't go above size 4
                     if self.paddle.size < 4 then
-                        self.paddle.size = self.paddle.size + 1
+                        self.paddle.size = math.min(4, self.paddle.size + 1)
                         self.paddle.width = self.paddle.width + 32
+                        self.paddle.x = math.max(self.paddle.x - 16, 0)
                     end
 
                     -- multiply recover points by 2
@@ -269,8 +270,9 @@ function PlayState:update(dt)
             })
         else
             if self.paddle.size > 1 then
-                self.paddle.size = self.paddle.size - 1
+                self.paddle.size = math.max(1, self.paddle.size - 1)
                 self.paddle.width = self.paddle.width - 32
+                self.paddle.x = math.min(self.paddle.x + 16, VIRTUAL_WIDTH - self.paddle.width)
             end
             gStateMachine:change('serve', {
                 paddle = self.paddle,
