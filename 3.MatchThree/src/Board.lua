@@ -79,7 +79,7 @@ function Board:calculateMatches()
 
                     -- go backwards from here by matchNum
                     for x2 = x - 1, x - matchNum, -1 do
-
+                        
                         -- add each tile to the match that's in that match
                         table.insert(match, self.tiles[y][x2])
                     end
