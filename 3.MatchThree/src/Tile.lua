@@ -34,7 +34,7 @@ function Tile:init(x, y, color, variety)
     -- tile appearance/points
     self.color = color
     self.variety = variety
-    self.shiny = true
+    self.shiny = math.random(100) < 2
 
     -- particle system for a shiny block
     if self.shiny then
