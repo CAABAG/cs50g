@@ -155,6 +155,19 @@ function Board:calculateMatches()
         end
     end
 
+    for k, match in pairs(matches) do
+        for k, tile in pairs(match) do
+            if tile.shiny then
+                local row = {}
+                for x = 1, 8 do
+                    table.insert(row, self.tiles[tile.gridY][x])
+                    self.tiles[tile.gridY][x].shiny = false
+                end
+                table.insert(matches, row)
+            end
+        end
+    end
+
     -- store matches for later reference
     self.matches = matches
 
@@ -254,6 +267,14 @@ function Board:getFallingTiles()
     end
 
     return tweens
+end
+
+function Board:update(dt)
+    for y = 1, #self.tiles do
+        for x = 1, #self.tiles[1] do
+            self.tiles[y][x]:update(dt)
+        end
+    end
 end
 
 function Board:render()
