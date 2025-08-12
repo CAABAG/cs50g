@@ -13,6 +13,14 @@
 
 Tile = Class{}
 
+paletteColors = {
+    [1] = {
+        ['r'] = 255,
+        ['g'] = 255,
+        ['b'] = 255
+    }
+}
+
 function Tile:init(x, y, color, variety)
     
     -- board positions
@@ -27,6 +35,35 @@ function Tile:init(x, y, color, variety)
     self.color = color
     self.variety = variety
     self.shiny = true
+
+    -- particle system for a shiny block
+    if self.shiny then
+        self.psystem = love.graphics.newParticleSystem(gTextures['particle'], 24)
+        self.psystem:setParticleLifetime(2)
+        self.psystem:setLinearAcceleration(-30, -30, 30, 30)
+        self.psystem:setEmissionArea('normal', 1, 1)
+
+        self.psystem:setColors(
+            paletteColors[1].r / 255,
+            paletteColors[1].g / 255,
+            paletteColors[1].b / 255,
+            155 / 255,
+            paletteColors[1].r / 255,
+            paletteColors[1].g / 255,
+            paletteColors[1].b / 255,
+            0
+        )
+    end
+end
+
+function Tile:update(dt)
+    if not self.shiny then
+        return
+    end
+    if  self.psystem:getCount() == 0 then
+        self.psystem:emit(12)
+    end
+    self.psystem:update(dt)
 end
 
 function Tile:render(x, y)
@@ -40,4 +77,9 @@ function Tile:render(x, y)
     love.graphics.setColor(255, 255, 255, 255)
     love.graphics.draw(gTextures['main'], gFrames['tiles'][self.color][self.variety],
         self.x + x, self.y + y)
+
+    -- draw particle system
+    if self.shiny then
+        love.graphics.draw(self.psystem, self.x + x + 16, self.y + y + 16)
+    end
 end
