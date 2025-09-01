@@ -217,6 +217,14 @@ function PlayState:calculateMatches()
             -- as a result of falling blocks once new blocks have finished falling
             self:calculateMatches()
         end)
+
+        if not self.board:isPlausible() then
+            local fallingTiles = self.board:reinitialize()
+            
+            Timer.tween(0.25, fallingTiles):finish(function() 
+                self:calculateMatches()
+            end)
+        end
     
     -- if no matches, we can continue playing
     else

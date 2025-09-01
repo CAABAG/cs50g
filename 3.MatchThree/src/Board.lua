@@ -239,6 +239,16 @@ function Board:removeMatches()
     self.matches = nil
 end
 
+function Board:reinitialize()
+    for y = 1, 8 do
+        for x = 1, 8 do
+            self.tiles[y][x] = nil
+        end
+    end
+
+    return self:getFallingTiles()
+end
+
 --[[
     Shifts down all of the tiles that now have spaces below them, then returns a table that
     contains tweening information for these new tiles.
