@@ -37,12 +37,20 @@ function Board:initializeTiles()
         end
     end
 
-    while self:calculateMatches() do
+    while not self:isPlausible() do
         
         -- recursively initialize if matches were returned so we always have
         -- a matchless board on start
         self:initializeTiles()
     end
+end
+
+function Board:isPlausible()
+    if self:calculateMatches() then
+        return false
+    end
+
+    return self:hasPossibleMatches()
 end
 
 --[[
@@ -173,6 +181,48 @@ function Board:calculateMatches()
 
     -- return matches table if > 0, else just return false
     return #self.matches > 0 and self.matches or false
+end
+
+function Board:hasPossibleMatches()
+    local hasMatches = false
+
+    for y = 1, 7 do
+        for x = 1, 8 do
+            self:swapTiles(y, x, y+1, x)
+            if self:calculateMatches() then
+                hasMatches = true
+            end
+            self:swapTiles(y, x, y+1, x)
+            if hasMatches then
+                return true
+            end
+        end
+    end
+
+    for y = 1, 8 do
+        for x = 1, 7 do
+            self:swapTiles(y, x, y, x+1)
+            if self:calculateMatches() then
+                hasMatches = true
+            end
+            self:swapTiles(y, x, y, x+1)
+            if hasMatches then
+                return true
+            end
+        end
+    end
+
+    return false
+end
+
+function Board:swapTiles(firstY, firstX, secondY, secondX)
+    tmpTile = self.tiles[firstY][firstX]
+    self.tiles[firstY][firstX] = self.tiles[secondY][secondX]
+    self.tiles[firstY][firstX].gridX = self.tiles[secondY][secondX].gridX
+    self.tiles[firstY][firstX].gridY = self.tiles[secondY][secondX].gridY
+    self.tiles[secondY][secondX] = tmpTile
+    self.tiles[secondY][secondX].gridX = tmpTile.gridX
+    self.tiles[secondY][secondX].gridY = tmpTile.gridY
 end
 
 --[[
