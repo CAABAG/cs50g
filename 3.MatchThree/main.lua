@@ -78,10 +78,27 @@ function love.load()
 
     -- initialize input table
     love.keyboard.keysPressed = {}
+
+    love.mouse.wasButtonPressed = false
 end
 
 function love.resize(w, h)
     push:resize(w, h)
+end
+
+function love.mousereleased(x, y, button)
+    if button == 1 then
+        love.mouse.wasButtonPressed = true
+    end
+end
+
+function love.mouse.wasPressed()
+    if love.mouse.wasButtonPressed == true then
+        love.mouse.wasButtonPressed = false
+        return true
+    end
+
+    return false
 end
 
 function love.keypressed(key)
