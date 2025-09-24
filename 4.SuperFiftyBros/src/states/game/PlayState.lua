@@ -18,8 +18,23 @@ function PlayState:init()
     self.gravityOn = true
     self.gravityAmount = 6
 
+    local safeSpawnColumn = 0
+    local foundSafeSpace = false
+    for x = 1, self.tileMap.width do
+        if foundSafeSpace then
+            break
+        end
+        for y = 1, self.tileMap.height do
+            if self.tileMap.tiles[y][x].id == TILE_ID_GROUND then
+                safeSpawnColumn = x - 1
+                foundSafeSpace = true
+                break
+            end
+        end
+    end
+
     self.player = Player({
-        x = 0, y = 0,
+        x = safeSpawnColumn * TILE_SIZE, y = 0,
         width = 16, height = 20,
         texture = 'green-alien',
         stateMachine = StateMachine {
