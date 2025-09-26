@@ -15,6 +15,10 @@ function LevelMaker.generate(width, height)
     local entities = {}
     local objects = {}
 
+    local keySpawned = false
+    local lockSpawned = false
+    local keyLockPair = math.random(KEYS_NUMBER)
+
     local tileID = TILE_ID_GROUND
     
     -- whether we should draw our tiles with toppers
@@ -148,6 +152,32 @@ function LevelMaker.generate(width, height)
                                     gSounds['powerup-reveal']:play()
 
                                     table.insert(objects, gem)
+                                elseif keySpawned == false and math.random(10) == 1 then
+                                    local key = GameObject {
+                                        texture = 'keys-and-locks',
+                                        x = (x - 1) * TILE_SIZE,
+                                        y = (blockHeight - 1) * TILE_SIZE - 4,
+                                        width = 16,
+                                        height = 16,
+                                        frame = keyLockPair,
+                                        collidable = true,
+                                        consumable = true,
+                                        solid = false,
+
+                                        onConsume = function(player, object)
+                                            gSounds['pickup']:play()
+                                            player.score = player.score + 100
+                                            player.hasKey = true
+                                        end
+                                    }
+
+                                    Timer.tween(0.1, {
+                                        [key] = {y = (blockHeight - 2) * TILE_SIZE}
+                                    })
+                                    gSounds['powerup-reveal']:play()
+
+                                    table.insert(objects, key)
+                                    keySpawned = true
                                 end
 
                                 obj.hit = true
