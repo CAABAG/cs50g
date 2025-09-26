@@ -56,6 +56,8 @@ PLAYER_JUMP_VELOCITY = -150
 -- snail movement speed
 SNAIL_MOVE_SPEED = 10
 
+KEYS_NUMBER = 4
+
 --
 -- tile IDs
 --
