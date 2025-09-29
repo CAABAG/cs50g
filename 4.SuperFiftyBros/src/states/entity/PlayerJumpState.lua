@@ -59,11 +59,15 @@ function PlayerJumpState:update(dt)
     for k, object in pairs(self.player.level.objects) do
         if object:collides(self.player) then
             if object.solid then
-                object.onCollide(object)
+                object.onCollide(object, self.player)
 
                 self.player.y = object.y + object.height
                 self.player.dy = 0
                 self.player:changeState('falling')
+
+                if object.lock and object.hit then
+                    table.remove(self.player.level.objects, k)
+                end
             elseif object.consumable then
                 object.onConsume(self.player)
                 table.remove(self.player.level.objects, k)
