@@ -17,7 +17,7 @@ function LevelMaker.generate(width, height)
 
     local keyLockPair = math.random(KEYS_NUMBER)
     local keyX = math.random(width / 2)
-    local lockX = math.random(keyX, width)
+    local lockX = math.random(keyX, width - 10)
 
     local tileID = TILE_ID_GROUND
     
