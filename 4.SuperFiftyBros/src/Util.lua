@@ -62,6 +62,37 @@ function GenerateTileSets(quads, setsX, setsY, sizeX, sizeY)
     return tilesets
 end
 
+function GeneratePosts(atlas, postWidth, postHeight, postsNumber)
+    local sheetWidth = postsNumber
+
+    local sheetCounter = 1
+    local spritesheet = {}
+
+    for x = 0, sheetWidth - 1 do
+        spritesheet[sheetCounter] = love.graphics.newQuad(x * postWidth, 0, postWidth, postHeight, atlas:getDimensions())
+        sheetCounter = sheetCounter + 1
+    end
+
+    return spritesheet
+end
+
+function GenerateFlags(atlas, flagWidth, flagHeight, flagFrames, setsNumber, startX)
+    local sheetWidth = flagFrames
+    local sheetHeight = setsNumber
+
+    local sheetCounter = 1
+    local spritesheet = {}
+
+    for y = 0, sheetHeight - 1 do
+        for x = 0, sheetWidth - 1 do
+            spritesheet[sheetCounter] = love.graphics.newQuad(x * startX * flagWidth, y * flagHeight, flagWidth, flagHeight, atlas:getDimensions())
+            sheetCounter = sheetCounter + 1
+        end
+    end
+
+    return spritesheet
+end
+
 --[[
     Recursive table printing function.
     https://coronalabs.com/blog/2014/09/02/tutorial-printing-table-contents/
