@@ -58,6 +58,8 @@ function PlayState:update(dt)
     -- remove any nils from pickups, etc.
     self.level:clear()
 
+    local playerOpenedLock = self.player.openedLock
+
     -- update player and level
     self.player:update(dt)
     self.level:update(dt)
@@ -68,6 +70,15 @@ function PlayState:update(dt)
         self.player.x = 0
     elseif self.player.x > TILE_SIZE * self.tileMap.width - self.player.width then
         self.player.x = TILE_SIZE * self.tileMap.width - self.player.width
+    end
+
+    if (not playerOpenedLock and playerOpenedLock ~= self.player.openedLock) then
+        for k, object in pairs(self.level.objects) do
+            if object.texture == 'flags-and-posts' then
+                object.visible = true
+                break
+            end
+        end
     end
 end
 

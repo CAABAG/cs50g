@@ -47,6 +47,7 @@ require 'src/Animation'
 require 'src/Entity'
 require 'src/GameObject'
 require 'src/GameLevel'
+require 'src/GoalPost'
 require 'src/LevelMaker'
 require 'src/Player'
 require 'src/Snail'
@@ -74,7 +75,8 @@ gTextures = {
     ['backgrounds'] = love.graphics.newImage('graphics/backgrounds.png'),
     ['green-alien'] = love.graphics.newImage('graphics/green_alien.png'),
     ['creatures'] = love.graphics.newImage('graphics/creatures.png'),
-    ['keys-and-locks'] = love.graphics.newImage('graphics/keys_and_locks.png')
+    ['keys-and-locks'] = love.graphics.newImage('graphics/keys_and_locks.png'),
+    ['flags-and-posts'] = love.graphics.newImage('graphics/flags.png')
 }
 
 gFrames = {
@@ -88,7 +90,9 @@ gFrames = {
     ['backgrounds'] = GenerateQuads(gTextures['backgrounds'], 256, 128),
     ['green-alien'] = GenerateQuads(gTextures['green-alien'], 16, 20),
     ['creatures'] = GenerateQuads(gTextures['creatures'], 16, 16),
-    ['keys-and-locks'] = GenerateQuads(gTextures['keys-and-locks'], 16, 16)
+    ['keys-and-locks'] = GenerateQuads(gTextures['keys-and-locks'], 16, 16),
+    ['posts'] = GeneratePosts(gTextures['flags-and-posts'], 16, 48, 6),
+    ['flags'] = GenerateFlags(gTextures['flags-and-posts'], 16, 16, 3, 4, 96)
 }
 
 -- these need to be added after gFrames is initialized because they refer to gFrames from within

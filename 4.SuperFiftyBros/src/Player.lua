@@ -14,6 +14,7 @@ function Player:init(def)
     Entity.init(self, def)
     self.score = 0
     self.hasKey = false
+    self.openedLock = false
 end
 
 function Player:update(dt)

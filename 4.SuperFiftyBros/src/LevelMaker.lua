@@ -17,7 +17,9 @@ function LevelMaker.generate(width, height)
 
     local keyLockPair = math.random(KEYS_NUMBER)
     local keyX = math.random(width / 2)
-    local lockX = math.random(keyX, width)
+    local lockX = math.random(keyX, width - 10)
+    local goalpostX = width - 1
+    local goalpostSafeZone = {goalpostX - 1, goalpostX, goalpostX + 1}
 
     local tileID = TILE_ID_GROUND
     
@@ -42,7 +44,7 @@ function LevelMaker.generate(width, height)
         end
 
         -- chance to just be emptiness
-        if not x == keyX and not x == lockX and math.random(7) == 1 then
+        if not x == keyX and not x == lockX and not table.contains(goalpostSafeZone, x) and math.random(7) == 1 then
             for y = 7, height do
                 table.insert(tiles[y],
                     Tile(x, y, tileID, nil, tileset, topperset))
@@ -58,8 +60,19 @@ function LevelMaker.generate(width, height)
                     Tile(x, y, tileID, y == 7 and topper or nil, tileset, topperset))
             end
 
+            if x == goalpostX then
+                table.insert(objects,
+                    GoalPost {
+                        x = (x - 1) * TILE_SIZE,
+                        y = (blockHeight - 1) * TILE_SIZE,
+
+                        texture = 'flags-and-posts',
+                        post = math.random(6),
+                        flag = math.random(4)
+                    }
+                )
             -- chance to generate a pillar
-            if math.random(8) == 1 then
+            elseif x ~= goalpostSafeZone and math.random(8) == 1 then
                 blockHeight = 2
                 
                 -- chance to generate bush on pillar
@@ -100,7 +113,7 @@ function LevelMaker.generate(width, height)
             end
 
             -- chance to spawn a block
-            if x == keyX or math.random(10) == 1 then
+            if x == keyX or (not table.contains(goalpostSafeZone, x) and math.random(10) == 1) then
                 table.insert(objects,
 
                     -- jump block
@@ -206,6 +219,7 @@ function LevelMaker.generate(width, height)
                                 gSounds['powerup-reveal']:play()
                                 gSounds['pickup']:play()
                                 player.score = player.score + 100
+                                player.openedLock = true
                                 obj.hit = true
                             else
                                 gSounds['empty-block']:play()
