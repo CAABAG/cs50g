@@ -130,3 +130,16 @@ function print_r ( t )
     end
     print()
 end
+
+function table.contains(list, value)
+    local found = false
+
+    for _, element in pairs(list) do
+        if element == value then
+            found = true
+            break
+        end
+    end
+
+    return found
+end
