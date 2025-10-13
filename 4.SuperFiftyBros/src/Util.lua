@@ -85,7 +85,7 @@ function GenerateFlags(atlas, flagWidth, flagHeight, flagFrames, setsNumber, sta
 
     for y = 0, sheetHeight - 1 do
         for x = 0, sheetWidth - 1 do
-            spritesheet[sheetCounter] = love.graphics.newQuad(x * startX * flagWidth, y * flagHeight, flagWidth, flagHeight, atlas:getDimensions())
+            spritesheet[sheetCounter] = love.graphics.newQuad((x * flagWidth) + startX, y * flagHeight, flagWidth, flagHeight, atlas:getDimensions())
             sheetCounter = sheetCounter + 1
         end
     end
