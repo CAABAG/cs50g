@@ -44,7 +44,7 @@ function LevelMaker.generate(width, height)
         end
 
         -- chance to just be emptiness
-        if not x == keyX and not x == lockX and not table.contains(goalpostSafeZone, x) and math.random(7) == 1 then
+        if x ~= keyX and x ~= lockX and not table.contains(goalpostSafeZone, x) and math.random(7) == 1 then
             for y = 7, height do
                 table.insert(tiles[y],
                     Tile(x, y, tileID, nil, tileset, topperset))
@@ -113,7 +113,7 @@ function LevelMaker.generate(width, height)
             end
 
             -- chance to spawn a block
-            if x == keyX or (not table.contains(goalpostSafeZone, x) and math.random(10) == 1) then
+            if x == keyX or (x ~= lockX and not table.contains(goalpostSafeZone, x) and math.random(10) == 1) then
                 table.insert(objects,
 
                     -- jump block
