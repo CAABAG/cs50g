@@ -10,13 +10,19 @@ PlayState = Class{__includes = BaseState}
 function PlayState:init()
     self.camX = 0
     self.camY = 0
-    self.level = LevelMaker.generate(100, 10)
-    self.tileMap = self.level.tileMap
     self.background = math.random(3)
     self.backgroundX = 0
 
     self.gravityOn = true
     self.gravityAmount = 2
+end
+
+function PlayState:enter(params)
+    self.height = params.height
+    self.width = params.width
+
+    self.level = LevelMaker.generate(self.width, self.height)
+    self.tileMap = self.level.tileMap
 
     local safeSpawnColumn = 0
     local foundSafeSpace = false
@@ -42,10 +48,12 @@ function PlayState:init()
             ['walking'] = function() return PlayerWalkingState(self.player) end,
             ['jump'] = function() return PlayerJumpState(self.player, self.gravityAmount) end,
             ['falling'] = function() return PlayerFallingState(self.player, self.gravityAmount) end
-        },
-        map = self.tileMap,
-        level = self.level
+        }
     })
+
+    self.player.map = self.tileMap
+    self.player.level = self.level
+    self.player.score = params.score
 
     self:spawnEnemies()
 
