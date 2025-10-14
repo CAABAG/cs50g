@@ -4,7 +4,13 @@ function GoalPost:init(def)
     self.x = def.x
     self.y = def.y
 
+    self.width = 16
+    self.height = 48
+
     self.flagX = self.x + 8
+
+    self.consumable = def.consumable
+    self.onConsume = def.onConsume
 
     self.texture = def.texture
     self.post = def.post
@@ -29,7 +35,12 @@ function GoalPost:init(def)
 end
 
 function GoalPost:collides(target)
-    return false
+    if not self.visible then
+        return false
+    end
+
+    return not (self.x > target.x + target.width or target.x > self.x + self.width or
+                self.y > target.y + target.height or target.y > self.y + self.height)
 end
 
 function GoalPost:update(dt)

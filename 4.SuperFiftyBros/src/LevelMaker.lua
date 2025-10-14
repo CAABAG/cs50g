@@ -68,7 +68,17 @@ function LevelMaker.generate(width, height)
 
                         texture = 'flags-and-posts',
                         post = math.random(6),
-                        flag = math.random(4)
+                        flag = math.random(4),
+
+                        consumable = true,
+
+                        onConsume = function(player, object)
+                            gStateMachine:change('play', {
+                                width = player.map.width + 20,
+                                height = player.map.height,
+                                score = player.score
+                            })
+                        end
                     }
                 )
             -- chance to generate a pillar
