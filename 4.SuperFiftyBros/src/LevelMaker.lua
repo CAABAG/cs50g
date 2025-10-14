@@ -73,6 +73,7 @@ function LevelMaker.generate(width, height)
                         consumable = true,
 
                         onConsume = function(player, object)
+                            gSounds['powerup-reveal']:play()
                             gStateMachine:change('play', {
                                 width = player.map.width + 20,
                                 height = player.map.height,
