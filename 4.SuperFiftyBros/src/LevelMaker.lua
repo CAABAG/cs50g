@@ -227,7 +227,7 @@ function LevelMaker.generate(width, height)
 
                         onCollide = function(obj, player)
                             if player.hasKey then
-                                gSounds['powerup-reveal']:play()
+                                gSounds['empty-block']:play()
                                 gSounds['pickup']:play()
                                 player.score = player.score + 100
                                 player.openedLock = true
