@@ -64,7 +64,18 @@ function Room:generateEntities()
             width = 16,
             height = 16,
 
-            health = 1
+            health = 1,
+
+            onDeath = function(x, y)
+                local heart = GameObject(
+                    GAME_OBJECT_DEFS['heart'],
+                    x, y
+                )
+
+                heart.onCollide = function() end
+
+                table.insert(self.objects, heart)
+            end
         })
 
         self.entities[i].stateMachine = StateMachine {
@@ -158,7 +169,10 @@ function Room:update(dt)
 
         -- remove entity from the table if health is <= 0
         if entity.health <= 0 then
-            entity.dead = true
+            if not entity.dead then
+                entity.onDeath(entity.x, entity.y)
+                entity.dead = true
+            end
         elseif not entity.dead then
             entity:processAI({room = self}, dt)
             entity:update(dt)
