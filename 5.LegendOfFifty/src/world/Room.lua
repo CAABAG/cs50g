@@ -72,7 +72,10 @@ function Room:generateEntities()
                     x, y
                 )
 
-                heart.onCollide = function() end
+                heart.onCollide = function()
+                    gSounds['hit-player']:play()
+                    self.player.health = math.min(6, self.player.health + 2)
+                end
 
                 table.insert(self.objects, heart)
             end
@@ -190,12 +193,17 @@ function Room:update(dt)
         end
     end
 
-    for k, object in pairs(self.objects) do
+    for i = #self.objects, 1, -1 do
+        local object = self.objects[i]
+
         object:update(dt)
 
         -- trigger collision callback on object
         if self.player:collides(object) then
             object:onCollide()
+            if object.type == 'heart' then
+                table.remove(self.objects, i)
+            end
         end
     end
 end

@@ -28,6 +28,7 @@ GAME_OBJECT_DEFS = {
         -- TODO
     },
     ['heart'] = {
+        type = 'heart',
         texture = 'hearts',
         frame = 5,
         width = 16,
