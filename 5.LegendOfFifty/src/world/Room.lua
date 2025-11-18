@@ -122,6 +122,14 @@ function Room:generateObjects()
 
     -- add to list of objects in scene (only one switch for now)
     table.insert(self.objects, switch)
+
+    local pot = GameObject(
+        GAME_OBJECT_DEFS['pot'],
+        MAP_RENDER_OFFSET_X + TILE_SIZE,
+        MAP_RENDER_OFFSET_Y + TILE_SIZE
+    )
+
+    table.insert(self.objects, pot)
 end
 
 --[[
