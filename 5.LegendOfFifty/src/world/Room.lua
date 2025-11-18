@@ -67,6 +67,10 @@ function Room:generateEntities()
             health = 1,
 
             onDeath = function(x, y)
+                if math.random(10) ~= 1 then
+                    return
+                end
+
                 local heart = GameObject(
                     GAME_OBJECT_DEFS['heart'],
                     x, y
