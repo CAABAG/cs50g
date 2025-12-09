@@ -216,6 +216,9 @@ function Room:update(dt)
             if object.type == 'heart' then
                 table.remove(self.objects, i)
             end
+            if object.solid == true then
+                self.player:adjustSolidCollision(object)
+            end
         end
     end
 end
