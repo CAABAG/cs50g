@@ -26,43 +26,7 @@ end
 function Player:adjustSolidCollision(target)
     local selfY, selfHeight = self.y + self.height / 2, self.height - self.height / 2
 
-    local distanceLeft = self.x + self.width - target.x
-    local distanceRight = target.x + target.width - self.x
-    local distanceTop = selfY + selfHeight - target.y
-    local distanceBottom = target.y + target.height - selfY
-
-    local smallestDistance = 0
-    local direction = ''
-
-    if distanceLeft > 0 then
-        smallestDistance = distanceLeft
-        direction = 'left'
-    end
-
-    if distanceRight > 0 and smallestDistance > distanceRight then
-        smallestDistance = distanceRight
-        direction = 'right'
-    end
-
-    if distanceTop > 0 and smallestDistance > distanceTop then
-        smallestDistance = distanceTop
-        direction = 'top'
-    end
-
-    if distanceBottom > 0 and smallestDistance > distanceBottom then
-        smallestDistance = distanceBottom
-        direction = 'bottom'
-    end
-
-    if direction == 'left' then
-        self.x = target.x - self.width - 1
-    elseif direction == 'right' then
-        self.x = target.x + target.width + 1
-    elseif direction == 'top' then
-        self.y = target.y - self.height - 1
-    elseif direction == 'bottom' then
-        self.y = target.y + target.height - selfHeight + 1
-    end
+    Entity.adjustSolidCollision(self, target, selfY, selfHeight)
 end
 
 function Player:render()
