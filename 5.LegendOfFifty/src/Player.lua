@@ -54,8 +54,6 @@ function Player:adjustSolidCollision(target)
         direction = 'bottom'
     end
 
-    print("distanceLeft: " .. distanceLeft .. ", smallestDistance: " .. smallestDistance)
-
     if direction == 'left' then
         self.x = target.x - self.width - 1
     elseif direction == 'right' then
