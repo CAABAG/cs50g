@@ -201,7 +201,7 @@ function Room:update(dt)
                 entity.dead = true
             end
         elseif not entity.dead then
-            entity:processAI({room = self}, dt)
+            entity:processAI({room = self, objects = self.objects}, dt)
             entity:update(dt)
         end
 
