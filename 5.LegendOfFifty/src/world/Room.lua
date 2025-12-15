@@ -98,12 +98,12 @@ end
     Randomly creates an assortment of obstacles for the player to navigate around.
 ]]
 function Room:generateObjects()
+    local switchX = math.random(MAP_RENDER_OFFSET_X + TILE_SIZE, VIRTUAL_WIDTH - TILE_SIZE * 2 - 16)
+    local switchY = math.random(MAP_RENDER_OFFSET_Y + TILE_SIZE, VIRTUAL_HEIGHT - (VIRTUAL_HEIGHT - MAP_HEIGHT * TILE_SIZE) + MAP_RENDER_OFFSET_Y - TILE_SIZE - 16)
+
     local switch = GameObject(
         GAME_OBJECT_DEFS['switch'],
-        math.random(MAP_RENDER_OFFSET_X + TILE_SIZE,
-                    VIRTUAL_WIDTH - TILE_SIZE * 2 - 16),
-        math.random(MAP_RENDER_OFFSET_Y + TILE_SIZE,
-                    VIRTUAL_HEIGHT - (VIRTUAL_HEIGHT - MAP_HEIGHT * TILE_SIZE) + MAP_RENDER_OFFSET_Y - TILE_SIZE - 16)
+        switchX, switchY
     )
 
     -- define a function for the switch that will open all doors in the room
@@ -123,13 +123,25 @@ function Room:generateObjects()
     -- add to list of objects in scene (only one switch for now)
     table.insert(self.objects, switch)
 
-    local pot = GameObject(
-        GAME_OBJECT_DEFS['pot'],
-        MAP_RENDER_OFFSET_X + TILE_SIZE,
-        MAP_RENDER_OFFSET_Y + TILE_SIZE
-    )
+    for x = MAP_RENDER_OFFSET_X + TILE_SIZE, VIRTUAL_WIDTH - TILE_SIZE * 2 - 16, TILE_SIZE do
+        if x == switchX then
+            goto continue
+        end
 
-    table.insert(self.objects, pot)
+        for y = MAP_RENDER_OFFSET_Y + TILE_SIZE, VIRTUAL_HEIGHT - (VIRTUAL_HEIGHT - MAP_HEIGHT * TILE_SIZE) + MAP_RENDER_OFFSET_Y - TILE_SIZE - 16, TILE_SIZE do
+            if y == switchY then
+                goto continue
+            end
+
+            if math.random(15) == 1 then
+                table.insert(self.objects, GameObject(GAME_OBJECT_DEFS['pot'], x, y))
+            end
+
+            ::continue::
+        end
+
+        ::continue::
+    end
 end
 
 --[[
