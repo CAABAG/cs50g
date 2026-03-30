@@ -121,24 +121,42 @@ function Room:generateObjects()
     -- add to list of objects in scene (only one switch for now)
     table.insert(self.objects, switch)
 
-    for x = MAP_RENDER_OFFSET_X + TILE_SIZE, VIRTUAL_WIDTH - TILE_SIZE * 2 - 16, TILE_SIZE do
-        if x == switchX then
-            goto continue
-        end
+    -- pots spawning
+    local topDoor = Doorway('top')
+    local leftDoor = Doorway('left')
 
-        for y = MAP_RENDER_OFFSET_Y + TILE_SIZE, VIRTUAL_HEIGHT - (VIRTUAL_HEIGHT - MAP_HEIGHT * TILE_SIZE) + MAP_RENDER_OFFSET_Y - TILE_SIZE - 16, TILE_SIZE do
-            if y == switchY then
+    local xLeft = MAP_RENDER_OFFSET_X + TILE_SIZE
+    local xRight = VIRTUAL_WIDTH - TILE_SIZE * 3
+    local yTop = MAP_RENDER_OFFSET_Y + TILE_SIZE
+    local yBottom = VIRTUAL_HEIGHT - (VIRTUAL_HEIGHT - MAP_HEIGHT * TILE_SIZE) + MAP_RENDER_OFFSET_Y - TILE_SIZE * 2
+    for x = xLeft, xRight, TILE_SIZE do
+        for y = yTop, yBottom, TILE_SIZE do
+            -- spawn pots only against the walls
+            if (x ~= xLeft and x ~= xRight) and (y ~= yTop and y~=yBottom) then
                 goto continue
             end
 
-            if math.random(15) == 1 then
+            -- prevent pots from blocking doors
+            if x + TILE_SIZE >= topDoor.x and x <= topDoor.x + topDoor.width then
+                goto continue
+            end
+
+            if y + TILE_SIZE >= leftDoor.y and y <= leftDoor.y + leftDoor.height then
+                goto continue
+            end
+
+            -- prevent pots from blocking the switch
+            if x + TILE_SIZE >= switch.x and x <= switch.x + switch.width and y + TILE_SIZE >= switch.y and y <= switch.y + switch.height then
+                goto continue
+            end
+
+            -- 10% chance to spawn a pot in each place
+            if math.random(10) == 1 then
                 table.insert(self.objects, GameObject(GAME_OBJECT_DEFS['pot'], x, y))
             end
 
             ::continue::
         end
-
-        ::continue::
     end
 end
 
