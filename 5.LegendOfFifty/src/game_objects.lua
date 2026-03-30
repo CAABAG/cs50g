@@ -25,7 +25,21 @@ GAME_OBJECT_DEFS = {
         }
     },
     ['pot'] = {
-        -- TODO
+        type = 'pot',
+        texture = 'tiles',
+        frame = POTS_STANDING,
+        width = 16,
+        height = 16,
+        solid = true,
+        defaultState = 'standing',
+        states = {
+            ['standing'] = {
+                frame = POTS_STANDING
+            },
+            ['broken'] = {
+                frame = POTS_BROKEN
+            }
+        }
     },
     ['heart'] = {
         type = 'heart',

@@ -23,6 +23,12 @@ function Player:collides(target)
                 selfY + selfHeight < target.y or selfY > target.y + target.height)
 end
 
+function Player:adjustSolidCollision(target)
+    local selfY, selfHeight = self.y + self.height / 2, self.height - self.height / 2
+
+    Entity.adjustSolidCollision(self, target, selfY, selfHeight)
+end
+
 function Player:render()
     Entity.render(self)
     
