@@ -37,6 +37,8 @@ function PlayerPotLiftState:init(player, dungeon)
 
         if obj:collides({height = potHeight, width = potWidth, x = potPointX, y = potPointY}) then
             self.pickedPot = obj
+            table.remove(self.dungeon.currentRoom.objects, o)
+            break
         end
 
         ::continue::
@@ -61,6 +63,10 @@ function PlayerPotLiftState:update(dt)
 end
 
 function PlayerPotLiftState:render()
+    if self.pickedPot then
+        love.graphics.draw(gTextures[self.pickedPot.texture], gFrames[self.pickedPot.texture][self.pickedPot.frame], self.pickedPot.x, self.pickedPot.y)
+    end
+
     local anim = self.player.currentAnimation
     love.graphics.draw(gTextures[anim.texture], gFrames[anim.texture][anim:getCurrentFrame()],
         math.floor(self.player.x - self.player.offsetX), math.floor(self.player.y - self.player.offsetY))
