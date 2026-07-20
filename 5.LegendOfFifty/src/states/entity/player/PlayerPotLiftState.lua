@@ -70,7 +70,7 @@ function PlayerPotLiftState:update(dt)
         end
     end
 
-    if self.player.currentAnimation.currentFrame == 3 then
+    if self.pickedPot and self.player.currentAnimation.currentFrame == 3 then
         self.pickedPot.x = self.player.x
         self.pickedPot.y = self.player.y - self.pickedPot.height / 2
     end
