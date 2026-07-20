@@ -60,7 +60,11 @@ function PlayerPotLiftState:update(dt)
     -- if we've fully elapsed through one cycle of animation, change back to idle state
     if self.player.currentAnimation.timesPlayed > 0 then
         self.player.currentAnimation.timesPlayed = 0
-        self.player:changeState('idle')
+        if self.pickedPot then
+            self.player:changeState('walk-pot')
+        else
+            self.player:changeState('idle')
+        end
     end
 
     if self.pickedPot and not lifted then
