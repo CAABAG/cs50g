@@ -55,19 +55,33 @@ end
 -- end
 
 function PlayerPotLiftState:update(dt)
+    local lifted = false
+
     -- if we've fully elapsed through one cycle of animation, change back to idle state
     if self.player.currentAnimation.timesPlayed > 0 then
         self.player.currentAnimation.timesPlayed = 0
         self.player:changeState('idle')
     end
+
+    if self.pickedPot and not lifted then
+        if self.player.currentAnimation.currentFrame == 2 then
+            self.pickedPot.y = self.pickedPot.y - 0.2
+            lifted = true
+        end
+    end
+
+    if self.player.currentAnimation.currentFrame == 3 then
+        self.pickedPot.x = self.player.x
+        self.pickedPot.y = self.player.y - self.pickedPot.height / 2
+    end
 end
 
 function PlayerPotLiftState:render()
-    if self.pickedPot then
-        love.graphics.draw(gTextures[self.pickedPot.texture], gFrames[self.pickedPot.texture][self.pickedPot.frame], self.pickedPot.x, self.pickedPot.y)
-    end
-
     local anim = self.player.currentAnimation
     love.graphics.draw(gTextures[anim.texture], gFrames[anim.texture][anim:getCurrentFrame()],
         math.floor(self.player.x - self.player.offsetX), math.floor(self.player.y - self.player.offsetY))
+
+    if self.pickedPot then
+        love.graphics.draw(gTextures[self.pickedPot.texture], gFrames[self.pickedPot.texture][self.pickedPot.frame], self.pickedPot.x, self.pickedPot.y)
+    end
 end
