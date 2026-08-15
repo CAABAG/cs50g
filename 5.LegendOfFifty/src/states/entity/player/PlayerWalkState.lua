@@ -11,36 +11,41 @@ PlayerWalkState = Class{__includes = EntityWalkState}
 function PlayerWalkState:init(player, dungeon)
     self.entity = player
     self.dungeon = dungeon
+    self.anims = {
+        ['left'] = 'walk-left',
+        ['right'] = 'walk-right',
+        ['up'] = 'walk-up',
+        ['down'] = 'walk-down'
+    }
 
     -- render offset for spaced character sprite; negated in render function of state
     self.entity.offsetY = 5
     self.entity.offsetX = 0
 end
 
-function PlayerWalkState:update(dt)
+function PlayerWalkState:updateSprite()
     if love.keyboard.isDown('left') then
         self.entity.direction = 'left'
-        self.entity:changeAnimation('walk-left')
+        self.entity:changeAnimation(self.anims['left'])
     elseif love.keyboard.isDown('right') then
         self.entity.direction = 'right'
-        self.entity:changeAnimation('walk-right')
+        self.entity:changeAnimation(self.anims['right'])
     elseif love.keyboard.isDown('up') then
         self.entity.direction = 'up'
-        self.entity:changeAnimation('walk-up')
+        self.entity:changeAnimation(self.anims['up'])
     elseif love.keyboard.isDown('down') then
         self.entity.direction = 'down'
-        self.entity:changeAnimation('walk-down')
+        self.entity:changeAnimation(self.anims['down'])
     else
-        self.entity:changeState('idle')
+        if not self.entity.pickedPot then
+            self.entity:changeState('idle')
+        else
+            self.entity:changeState('idle-pot')
+        end
     end
+end
 
-    if love.keyboard.wasPressed('space') then
-        self.entity:changeState('swing-sword')
-    end
-
-    -- perform base collision detection against walls
-    EntityWalkState.update(self, dt)
-
+function PlayerWalkState:checkDoorways(dt)
     -- if we bumped something when checking collision, check any object collisions
     if self.bumped then
         if self.entity.direction == 'left' then
@@ -113,4 +118,20 @@ function PlayerWalkState:update(dt)
             self.entity.y = self.entity.y - PLAYER_WALK_SPEED * dt
         end
     end
+end
+
+function PlayerWalkState:update(dt)
+    self:updateSprite()
+
+    if love.keyboard.wasPressed('space') then
+        self.entity:changeState('swing-sword')
+    end
+
+    if love.keyboard.wasPressed('lctrl') then
+        self.entity:changeState('lift-pot')
+    end
+
+    -- perform base collision detection against walls
+    EntityWalkState.update(self, dt)
+    self:checkDoorways(dt)
 end
