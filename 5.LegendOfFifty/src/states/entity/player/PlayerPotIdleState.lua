@@ -1,6 +1,8 @@
 --[[
     GD50
     Legend of Zelda
+
+    Author: Piotr Brzostowski
 ]]
 
 PlayerPotIdleState = Class{__includes = EntityIdleState}

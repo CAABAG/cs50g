@@ -1,6 +1,8 @@
 --[[
     GD50
     Legend of Zelda
+
+    Author: Piotr Brzostowski
 ]]
 
 PlayerPotLiftState = Class{__includes = BaseState}

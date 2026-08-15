@@ -1,6 +1,8 @@
 --[[
     GD50
     Legend of Zelda
+
+    Author: Piotr Brzostowski
 ]]
 
 PlayerPotWalkState = Class{__includes = PlayerWalkState}
