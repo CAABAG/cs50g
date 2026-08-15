@@ -6,25 +6,25 @@
 PlayerPotLiftState = Class{__includes = BaseState}
 
 function PlayerPotLiftState:init(player, dungeon)
-    self.player = player
+    self.entity = player
     self.dungeon = dungeon
-    self.player.pickedPot = nil
+    self.entity.pickedPot = nil
 
-    local direction = self.player.direction
+    local direction = self.entity.direction
     local potPointX, potPointY, potWidth, potHeight
 
     if direction == 'left' then
-        potPointX = self.player.x - (self.player.width / 2) + (TILE_SIZE / 3)
-        potPointY = self.player.y + (self.player.height / 1.5)
+        potPointX = self.entity.x - (self.entity.width / 2) + (TILE_SIZE / 3)
+        potPointY = self.entity.y + (self.entity.height / 1.5)
     elseif direction == 'right' then
-        potPointX = self.player.x + self.player.width +  (self.player.width / 2) - (TILE_SIZE / 3)
-        potPointY = self.player.y + (self.player.height / 1.5)
+        potPointX = self.entity.x + self.entity.width +  (self.entity.width / 2) - (TILE_SIZE / 3)
+        potPointY = self.entity.y + (self.entity.height / 1.5)
     elseif direction == 'up' then
-        potPointX = self.player.x + (self.player.width / 2)
-        potPointY = self.player.y - (self.player.height / 5)
+        potPointX = self.entity.x + (self.entity.width / 2)
+        potPointY = self.entity.y - (self.entity.height / 5)
     else
-        potPointX = self.player.x + (self.player.width / 2)
-        potPointY = self.player.y + self.player.height + (self.player.height / 4)
+        potPointX = self.entity.x + (self.entity.width / 2)
+        potPointY = self.entity.y + self.entity.height + (self.entity.height / 4)
     end
 
     potWidth = 1
@@ -36,7 +36,7 @@ function PlayerPotLiftState:init(player, dungeon)
         end
 
         if obj:collides({height = potHeight, width = potWidth, x = potPointX, y = potPointY}) then
-            self.player.pickedPot = obj
+            self.entity.pickedPot = obj
             table.remove(self.dungeon.currentRoom.objects, o)
             break
         end
@@ -45,37 +45,37 @@ function PlayerPotLiftState:init(player, dungeon)
     end
 
     -- lift-pot-left, lift-pot-up, etc
-    self.player:changeAnimation('lift-pot-' .. direction)
+    self.entity:changeAnimation('lift-pot-' .. direction)
 end
 
 function PlayerPotLiftState:update(dt)
     -- if we've fully elapsed through one cycle of animation, change back to idle state
     -- unless the pot was found
-    if self.player.currentAnimation.timesPlayed > 0 then
-        self.player.currentAnimation.timesPlayed = 0
-        if self.player.pickedPot then
-            self.player:changeState('idle-pot')
+    if self.entity.currentAnimation.timesPlayed > 0 then
+        self.entity.currentAnimation.timesPlayed = 0
+        if self.entity.pickedPot then
+            self.entity:changeState('idle-pot')
         else
-            self.player:changeState('idle')
+            self.entity:changeState('idle')
         end
     end
 
-    if self.player.pickedPot then
-        if self.player.currentAnimation.currentFrame == 2 then
-            self.player.pickedPot.y = self.player.pickedPot.y - 0.2
-        elseif self.player.currentAnimation.currentFrame == 3 then
-            self.player.pickedPot.x = self.player.x
-            self.player.pickedPot.y = self.player.y - self.player.pickedPot.height / 2
+    if self.entity.pickedPot then
+        if self.entity.currentAnimation.currentFrame == 2 then
+            self.entity.pickedPot.y = self.entity.pickedPot.y - 0.2
+        elseif self.entity.currentAnimation.currentFrame == 3 then
+            self.entity.pickedPot.x = self.entity.x
+            self.entity.pickedPot.y = self.entity.y - self.entity.pickedPot.height / 2
         end
     end
 end
 
 function PlayerPotLiftState:render()
-    local anim = self.player.currentAnimation
+    local anim = self.entity.currentAnimation
     love.graphics.draw(gTextures[anim.texture], gFrames[anim.texture][anim:getCurrentFrame()],
-        math.floor(self.player.x - self.player.offsetX), math.floor(self.player.y - self.player.offsetY))
+        math.floor(self.entity.x - self.entity.offsetX), math.floor(self.entity.y - self.entity.offsetY))
 
-    if self.player.pickedPot then
-        love.graphics.draw(gTextures[self.player.pickedPot.texture], gFrames[self.player.pickedPot.texture][self.player.pickedPot.frame], self.player.pickedPot.x, self.player.pickedPot.y)
+    if self.entity.pickedPot then
+        love.graphics.draw(gTextures[self.entity.pickedPot.texture], gFrames[self.entity.pickedPot.texture][self.entity.pickedPot.frame], self.entity.pickedPot.x, self.entity.pickedPot.y)
     end
 end
