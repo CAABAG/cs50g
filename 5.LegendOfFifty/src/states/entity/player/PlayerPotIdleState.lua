@@ -15,7 +15,7 @@ function PlayerPotIdleState:init(player, dungeon)
         ['down'] = 'idle-pot-down'
     }
 
-    self.entity:changeAnimation('idle-pot-' .. self.entity.direction)
+    self.entity:changeAnimation(self.anims[self.entity.direction])
 end
 
 function PlayerPotIdleState:update(dt)
