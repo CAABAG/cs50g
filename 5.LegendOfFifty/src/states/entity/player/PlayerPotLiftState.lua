@@ -8,7 +8,7 @@ PlayerPotLiftState = Class{__includes = BaseState}
 function PlayerPotLiftState:init(player, dungeon)
     self.player = player
     self.dungeon = dungeon
-    self.pickedPot = nil
+    self.player.pickedPot = nil
 
     local direction = self.player.direction
     local potPointX, potPointY, potWidth, potHeight
@@ -36,7 +36,7 @@ function PlayerPotLiftState:init(player, dungeon)
         end
 
         if obj:collides({height = potHeight, width = potWidth, x = potPointX, y = potPointY}) then
-            self.pickedPot = obj
+            self.player.pickedPot = obj
             table.remove(self.dungeon.currentRoom.objects, o)
             break
         end
@@ -60,23 +60,23 @@ function PlayerPotLiftState:update(dt)
     -- if we've fully elapsed through one cycle of animation, change back to idle state
     if self.player.currentAnimation.timesPlayed > 0 then
         self.player.currentAnimation.timesPlayed = 0
-        if self.pickedPot then
-            self.player:changeState('walk-pot')
+        if self.player.pickedPot then
+            self.player:changeState('idle-pot')
         else
             self.player:changeState('idle')
         end
     end
 
-    if self.pickedPot and not lifted then
+    if self.player.pickedPot and not lifted then
         if self.player.currentAnimation.currentFrame == 2 then
-            self.pickedPot.y = self.pickedPot.y - 0.2
+            self.player.pickedPot.y = self.player.pickedPot.y - 0.2
             lifted = true
         end
     end
 
-    if self.pickedPot and self.player.currentAnimation.currentFrame == 3 then
-        self.pickedPot.x = self.player.x
-        self.pickedPot.y = self.player.y - self.pickedPot.height / 2
+    if self.player.pickedPot and self.player.currentAnimation.currentFrame == 3 then
+        self.player.pickedPot.x = self.player.x
+        self.player.pickedPot.y = self.player.y - self.player.pickedPot.height / 2
     end
 end
 
@@ -85,7 +85,7 @@ function PlayerPotLiftState:render()
     love.graphics.draw(gTextures[anim.texture], gFrames[anim.texture][anim:getCurrentFrame()],
         math.floor(self.player.x - self.player.offsetX), math.floor(self.player.y - self.player.offsetY))
 
-    if self.pickedPot then
-        love.graphics.draw(gTextures[self.pickedPot.texture], gFrames[self.pickedPot.texture][self.pickedPot.frame], self.pickedPot.x, self.pickedPot.y)
+    if self.player.pickedPot then
+        love.graphics.draw(gTextures[self.player.pickedPot.texture], gFrames[self.player.pickedPot.texture][self.player.pickedPot.frame], self.player.pickedPot.x, self.player.pickedPot.y)
     end
 end
