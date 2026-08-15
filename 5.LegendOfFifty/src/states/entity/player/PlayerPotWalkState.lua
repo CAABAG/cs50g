@@ -14,7 +14,6 @@ function PlayerPotWalkState:init(player, dungeon)
         ['up'] = 'walk-pot-up',
         ['down'] = 'walk-pot-down'
     }
-    -- print(self.anims['left'])
 
     -- render offset for spaced character sprite; negated in render function of state
     self.entity.offsetY = 5
