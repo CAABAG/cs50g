@@ -48,16 +48,9 @@ function PlayerPotLiftState:init(player, dungeon)
     self.player:changeAnimation('lift-pot-' .. direction)
 end
 
--- function PlayerHoldPotState:enter()
--- end
-
--- function PlayerHoldPotState:exit()
--- end
-
 function PlayerPotLiftState:update(dt)
-    local lifted = false
-
     -- if we've fully elapsed through one cycle of animation, change back to idle state
+    -- unless the pot was found
     if self.player.currentAnimation.timesPlayed > 0 then
         self.player.currentAnimation.timesPlayed = 0
         if self.player.pickedPot then
@@ -67,16 +60,13 @@ function PlayerPotLiftState:update(dt)
         end
     end
 
-    if self.player.pickedPot and not lifted then
+    if self.player.pickedPot then
         if self.player.currentAnimation.currentFrame == 2 then
             self.player.pickedPot.y = self.player.pickedPot.y - 0.2
-            lifted = true
+        elseif self.player.currentAnimation.currentFrame == 3 then
+            self.player.pickedPot.x = self.player.x
+            self.player.pickedPot.y = self.player.y - self.player.pickedPot.height / 2
         end
-    end
-
-    if self.player.pickedPot and self.player.currentAnimation.currentFrame == 3 then
-        self.player.pickedPot.x = self.player.x
-        self.player.pickedPot.y = self.player.y - self.player.pickedPot.height / 2
     end
 end
 
