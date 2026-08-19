@@ -21,6 +21,11 @@ function PlayerPotIdleState:init(player, dungeon)
 end
 
 function PlayerPotIdleState:update(dt)
+    if love.keyboard.isDown('lctrl') or love.keyboard.isDown('space') then
+        self.entity.pickedPot = nil
+        self.entity:changeState('idle')
+    end
+
     if love.keyboard.isDown('left') or love.keyboard.isDown('right') or
        love.keyboard.isDown('up') or love.keyboard.isDown('down') then
         self.entity:changeState('walk-pot')

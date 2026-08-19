@@ -23,6 +23,11 @@ function PlayerPotWalkState:init(player, dungeon)
 end
 
 function PlayerPotWalkState:update(dt)
+    if love.keyboard.isDown('lctrl') or love.keyboard.isDown('space') then
+        self.entity.pickedPot = nil
+        self.entity:changeState('idle')
+    end
+
     PlayerWalkState.updateSprite(self)
     EntityWalkState.update(self, dt)
     PlayerWalkState.checkDoorways(self, dt)
