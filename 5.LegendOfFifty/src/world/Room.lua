@@ -23,6 +23,8 @@ function Room:init(player)
     self.objects = {}
     self:generateObjects()
 
+    self.projectiles = {}
+
     -- doorways that lead to other dungeon rooms
     self.doorways = {}
     table.insert(self.doorways, Doorway('top', false, self))
@@ -233,6 +235,18 @@ function Room:update(dt)
         end
     end
 
+    for i = #self.projectiles, 1, -1 do
+        local projectile = self.projectiles[i]
+        projectile:update(dt)
+
+        for j = #self.entities, 1, -1 do
+            if self.entities[j]:collides(projectile) then
+                gSounds['hit-enemy']:play()
+                print('oof')
+            end
+        end
+    end
+
     for i = #self.objects, 1, -1 do
         local object = self.objects[i]
 
@@ -273,6 +287,10 @@ function Room:render()
 
     for k, entity in pairs(self.entities) do
         if not entity.dead then entity:render(self.adjacentOffsetX, self.adjacentOffsetY) end
+    end
+
+    for k, projectile in pairs(self.projectiles) do
+        projectile:render(self.adjacentOffsetX, self.adjacentOffsetY)
     end
 
     -- stencil out the door arches so it looks like the player is going through

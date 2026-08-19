@@ -24,6 +24,12 @@ end
 
 function PlayerPotWalkState:update(dt)
     if love.keyboard.isDown('lctrl') or love.keyboard.isDown('space') then
+        local projectile = Projectile()
+        projectile.x = self.entity.x
+        projectile.y = self.entity.y
+        projectile.direction = self.entity.direction
+        table.insert(self.dungeon.currentRoom.projectiles, projectile)
+
         self.entity.pickedPot = nil
         self.entity:changeState('idle')
     end
