@@ -22,6 +22,9 @@ end
 
 function PlayerPotIdleState:update(dt)
     if love.keyboard.isDown('lctrl') or love.keyboard.isDown('space') then
+        local projectile = Projectile(GAME_OBJECT_DEFS['pot'], self.entity.x, self.entity.y, self.entity.direction)
+        table.insert(self.dungeon.currentRoom.projectiles, projectile)
+
         self.entity.pickedPot = nil
         self.entity:changeState('idle')
     end

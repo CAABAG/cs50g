@@ -23,6 +23,8 @@ function Room:init(player)
     self.objects = {}
     self:generateObjects()
 
+    self.projectiles = {}
+
     -- doorways that lead to other dungeon rooms
     self.doorways = {}
     table.insert(self.doorways, Doorway('top', false, self))
@@ -233,6 +235,59 @@ function Room:update(dt)
         end
     end
 
+    for i = #self.projectiles, 1, -1 do
+        local projectile = self.projectiles[i]
+        projectile:update(dt)
+
+        if projectile.secondsBroken >= POT_SECONDS_TO_BREAK then
+            table.remove(self.projectiles, i)
+            goto continue
+        end
+
+        for j = #self.entities, 1, -1 do
+            if self.entities[j]:collides(projectile) then
+                self.entities[j]:damage(1)
+                gSounds['hit-enemy']:play()
+                projectile.state = 'broken'
+                goto continue
+            end
+        end
+
+        for j = #self.doorways, 1, -1 do
+            if not (projectile.x + projectile.width < self.doorways[j].x or projectile.x > self.doorways[j].x + self.doorways[j].width or
+                projectile.y + projectile.height < self.doorways[j].y or projectile.y > self.doorways[j].y + self.doorways[j].height) then
+                    projectile.state = 'broken'
+                    gSounds['hit-enemy']:play()
+                    goto continue
+                end
+        end
+
+        if projectile.x <= TILE_SIZE * 1.5 then
+            projectile.state = 'broken'
+            gSounds['hit-enemy']:play()
+            goto continue
+        end
+
+        if projectile.x >= ((MAP_WIDTH * TILE_SIZE) - (TILE_SIZE * 0.5)) then
+            projectile.state = 'broken'
+            gSounds['hit-enemy']:play()
+            goto continue
+        end
+
+        if projectile.y <= TILE_SIZE * 1.5 then
+            projectile.state = 'broken'
+            gSounds['hit-enemy']:play()
+            goto continue
+        end
+
+        if projectile.y >= ((MAP_HEIGHT * TILE_SIZE) - (TILE_SIZE * 0.5)) then
+            projectile.state = 'broken'
+            gSounds['hit-enemy']:play()
+            goto continue
+        end
+        ::continue::
+    end
+
     for i = #self.objects, 1, -1 do
         local object = self.objects[i]
 
@@ -273,6 +328,10 @@ function Room:render()
 
     for k, entity in pairs(self.entities) do
         if not entity.dead then entity:render(self.adjacentOffsetX, self.adjacentOffsetY) end
+    end
+
+    for k, projectile in pairs(self.projectiles) do
+        projectile:render(self.adjacentOffsetX, self.adjacentOffsetY)
     end
 
     -- stencil out the door arches so it looks like the player is going through
