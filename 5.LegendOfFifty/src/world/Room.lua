@@ -245,8 +245,9 @@ function Room:update(dt)
 
         for j = #self.entities, 1, -1 do
             if self.entities[j]:collides(projectile) then
+                self.entities[j]:damage(1)
                 gSounds['hit-enemy']:play()
-                print('oof')
+                projectile.state = 'broken'
             end
         end
         ::continue::
