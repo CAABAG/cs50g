@@ -67,14 +67,6 @@ function EntityWalkState:processAI(params, dt)
     local objects = params.objects
     local directions = {'left', 'right', 'up', 'down'}
 
-    for o, obj in pairs(objects) do
-        if obj.solid and self.entity:collides(obj) then
-            self.entity:adjustSolidCollision(obj)
-            self.bumped = true
-            break
-        end
-    end
-
     if self.moveDuration == 0 or self.bumped then
         
         -- set an initial move duration and direction
