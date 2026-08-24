@@ -35,8 +35,10 @@ function PlayerPotWalkState:update(dt)
     EntityWalkState.update(self, dt)
     PlayerWalkState.checkDoorways(self, dt)
 
-    self.entity.pickedPot.x = self.entity.x
-    self.entity.pickedPot.y = self.entity.y - self.entity.pickedPot.height / 2
+    if self.entity.pickedPot then
+        self.entity.pickedPot.x = self.entity.x
+        self.entity.pickedPot.y = self.entity.y - self.entity.pickedPot.height / 2
+    end
 end
 
 function PlayerPotWalkState:render()
@@ -44,5 +46,7 @@ function PlayerPotWalkState:render()
     love.graphics.draw(gTextures[anim.texture], gFrames[anim.texture][anim:getCurrentFrame()],
         math.floor(self.entity.x - self.entity.offsetX), math.floor(self.entity.y - self.entity.offsetY))
 
-    love.graphics.draw(gTextures[self.entity.pickedPot.texture], gFrames[self.entity.pickedPot.texture][self.entity.pickedPot.frame], self.entity.pickedPot.x, self.entity.pickedPot.y)
+    if self.entity.pickedPot then
+        love.graphics.draw(gTextures[self.entity.pickedPot.texture], gFrames[self.entity.pickedPot.texture][self.entity.pickedPot.frame], self.entity.pickedPot.x, self.entity.pickedPot.y)
+    end
 end
