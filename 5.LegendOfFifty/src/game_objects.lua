@@ -27,17 +27,17 @@ GAME_OBJECT_DEFS = {
     ['pot'] = {
         type = 'pot',
         texture = 'tiles',
-        frame = POTS_STANDING,
+        frame = POT_WHOLE,
         width = 16,
         height = 16,
         solid = true,
-        defaultState = 'standing',
+        defaultState = 'whole',
         states = {
-            ['standing'] = {
-                frame = POTS_STANDING
+            ['whole'] = {
+                frame = POT_WHOLE
             },
             ['broken'] = {
-                frame = POTS_BROKEN
+                frame = POT_BROKEN
             }
         }
     },
