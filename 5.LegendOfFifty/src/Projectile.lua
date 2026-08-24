@@ -54,21 +54,25 @@ function Projectile:update(dt)
         self.x = self.x - POT_FLY_SPEED * dt
         if self.x <= self.thresholdX then
             self.state = 'broken'
+            gSounds['hit-enemy']:play()
         end
     elseif self.direction == 'right' then
         self.x = self.x + POT_FLY_SPEED * dt
         if self.x >= self.thresholdX then
             self.state = 'broken'
+            gSounds['hit-enemy']:play()
         end
     elseif self.direction == 'up' then
         self.y = self.y - POT_FLY_SPEED * dt
         if self.y <= self.thresholdY then
             self.state = 'broken'
+            gSounds['hit-enemy']:play()
         end
     elseif self.direction == 'down' then
         self.y = self.y + POT_FLY_SPEED * dt
         if self.y >= self.thresholdY then
             self.state = 'broken'
+            gSounds['hit-enemy']:play()
         end
     end
 end
