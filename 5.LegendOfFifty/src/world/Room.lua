@@ -238,6 +238,7 @@ function Room:update(dt)
     for i = #self.projectiles, 1, -1 do
         local projectile = self.projectiles[i]
         projectile:update(dt)
+
         if projectile.secondsBroken >= POT_SECONDS_TO_BREAK then
             table.remove(self.projectiles, i)
             goto continue
@@ -248,7 +249,41 @@ function Room:update(dt)
                 self.entities[j]:damage(1)
                 gSounds['hit-enemy']:play()
                 projectile.state = 'broken'
+                goto continue
             end
+        end
+
+        for j = #self.doorways, 1, -1 do
+            if not (projectile.x + projectile.width < self.doorways[j].x or projectile.x > self.doorways[j].x + self.doorways[j].width or
+                projectile.y + projectile.height < self.doorways[j].y or projectile.y > self.doorways[j].y + self.doorways[j].height) then
+                    projectile.state = 'broken'
+                    gSounds['hit-enemy']:play()
+                    goto continue
+                end
+        end
+
+        if projectile.x <= TILE_SIZE * 1.5 then
+            projectile.state = 'broken'
+            gSounds['hit-enemy']:play()
+            goto continue
+        end
+
+        if projectile.x >= ((MAP_WIDTH * TILE_SIZE) - (TILE_SIZE * 0.5)) then
+            projectile.state = 'broken'
+            gSounds['hit-enemy']:play()
+            goto continue
+        end
+
+        if projectile.y <= TILE_SIZE * 1.5 then
+            projectile.state = 'broken'
+            gSounds['hit-enemy']:play()
+            goto continue
+        end
+
+        if projectile.y >= ((MAP_HEIGHT * TILE_SIZE) - (TILE_SIZE * 0.5)) then
+            projectile.state = 'broken'
+            gSounds['hit-enemy']:play()
+            goto continue
         end
         ::continue::
     end
