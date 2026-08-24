@@ -23,6 +23,8 @@ function Room:init(player)
     self.objects = {}
     self:generateObjects()
 
+    self.projectiles = {}
+
     -- doorways that lead to other dungeon rooms
     self.doorways = {}
     table.insert(self.doorways, Doorway('top', false, self))
@@ -55,11 +57,9 @@ function Room:generateEntities()
             animations = ENTITY_DEFS[type].animations,
             walkSpeed = ENTITY_DEFS[type].walkSpeed or 20,
 
-            -- ensure X and Y are within bounds of the map
-            x = math.random(MAP_RENDER_OFFSET_X + TILE_SIZE,
-                VIRTUAL_WIDTH - TILE_SIZE * 2 - 16),
-            y = math.random(MAP_RENDER_OFFSET_Y + TILE_SIZE,
-                VIRTUAL_HEIGHT - (VIRTUAL_HEIGHT - MAP_HEIGHT * TILE_SIZE) + MAP_RENDER_OFFSET_Y - TILE_SIZE - 16),
+            -- ensure X and Y are within bounds of the map, 1 tile size away from the walls
+            x = math.random(MAP_RENDER_OFFSET_X + (TILE_SIZE * 2), VIRTUAL_WIDTH - (TILE_SIZE * 4)),
+            y = math.random(MAP_RENDER_OFFSET_Y + (TILE_SIZE * 2), VIRTUAL_HEIGHT - (TILE_SIZE * 4)),
             
             width = 16,
             height = 16,
@@ -98,12 +98,12 @@ end
     Randomly creates an assortment of obstacles for the player to navigate around.
 ]]
 function Room:generateObjects()
+    local switchX = math.random(MAP_RENDER_OFFSET_X + TILE_SIZE, VIRTUAL_WIDTH - TILE_SIZE * 2 - 16)
+    local switchY = math.random(MAP_RENDER_OFFSET_Y + TILE_SIZE, VIRTUAL_HEIGHT - (VIRTUAL_HEIGHT - MAP_HEIGHT * TILE_SIZE) + MAP_RENDER_OFFSET_Y - TILE_SIZE - 16)
+
     local switch = GameObject(
         GAME_OBJECT_DEFS['switch'],
-        math.random(MAP_RENDER_OFFSET_X + TILE_SIZE,
-                    VIRTUAL_WIDTH - TILE_SIZE * 2 - 16),
-        math.random(MAP_RENDER_OFFSET_Y + TILE_SIZE,
-                    VIRTUAL_HEIGHT - (VIRTUAL_HEIGHT - MAP_HEIGHT * TILE_SIZE) + MAP_RENDER_OFFSET_Y - TILE_SIZE - 16)
+        switchX, switchY
     )
 
     -- define a function for the switch that will open all doors in the room
@@ -122,6 +122,44 @@ function Room:generateObjects()
 
     -- add to list of objects in scene (only one switch for now)
     table.insert(self.objects, switch)
+
+    -- pots spawning
+    local topDoor = Doorway('top')
+    local leftDoor = Doorway('left')
+
+    local xLeft = MAP_RENDER_OFFSET_X + TILE_SIZE
+    local xRight = VIRTUAL_WIDTH - TILE_SIZE * 3
+    local yTop = MAP_RENDER_OFFSET_Y + TILE_SIZE
+    local yBottom = VIRTUAL_HEIGHT - (VIRTUAL_HEIGHT - MAP_HEIGHT * TILE_SIZE) + MAP_RENDER_OFFSET_Y - TILE_SIZE * 2
+    for x = xLeft, xRight, TILE_SIZE do
+        for y = yTop, yBottom, TILE_SIZE do
+            -- spawn pots only against the walls
+            if (x ~= xLeft and x ~= xRight) and (y ~= yTop and y~=yBottom) then
+                goto continue
+            end
+
+            -- prevent pots from blocking doors
+            if x + TILE_SIZE >= topDoor.x and x <= topDoor.x + topDoor.width then
+                goto continue
+            end
+
+            if y + TILE_SIZE >= leftDoor.y and y <= leftDoor.y + leftDoor.height then
+                goto continue
+            end
+
+            -- prevent pots from blocking the switch
+            if x + TILE_SIZE >= switch.x and x <= switch.x + switch.width and y + TILE_SIZE >= switch.y and y <= switch.y + switch.height then
+                goto continue
+            end
+
+            -- 10% chance to spawn a pot in each place
+            if math.random(10) == 1 then
+                table.insert(self.objects, GameObject(GAME_OBJECT_DEFS['pot'], x, y))
+            end
+
+            ::continue::
+        end
+    end
 end
 
 --[[
@@ -181,7 +219,7 @@ function Room:update(dt)
                 entity.dead = true
             end
         elseif not entity.dead then
-            entity:processAI({room = self}, dt)
+            entity:processAI({room = self, objects = self.objects}, dt)
             entity:update(dt)
         end
 
@@ -197,6 +235,59 @@ function Room:update(dt)
         end
     end
 
+    for i = #self.projectiles, 1, -1 do
+        local projectile = self.projectiles[i]
+        projectile:update(dt)
+
+        if projectile.secondsBroken >= POT_SECONDS_TO_BREAK then
+            table.remove(self.projectiles, i)
+            goto continue
+        end
+
+        for j = #self.entities, 1, -1 do
+            if self.entities[j]:collides(projectile) then
+                self.entities[j]:damage(1)
+                gSounds['hit-enemy']:play()
+                projectile.state = 'broken'
+                goto continue
+            end
+        end
+
+        for j = #self.doorways, 1, -1 do
+            if not (projectile.x + projectile.width < self.doorways[j].x or projectile.x > self.doorways[j].x + self.doorways[j].width or
+                projectile.y + projectile.height < self.doorways[j].y or projectile.y > self.doorways[j].y + self.doorways[j].height) then
+                    projectile.state = 'broken'
+                    gSounds['hit-enemy']:play()
+                    goto continue
+                end
+        end
+
+        if projectile.x <= TILE_SIZE * 1.5 then
+            projectile.state = 'broken'
+            gSounds['hit-enemy']:play()
+            goto continue
+        end
+
+        if projectile.x >= ((MAP_WIDTH * TILE_SIZE) - (TILE_SIZE * 0.5)) then
+            projectile.state = 'broken'
+            gSounds['hit-enemy']:play()
+            goto continue
+        end
+
+        if projectile.y <= TILE_SIZE * 1.5 then
+            projectile.state = 'broken'
+            gSounds['hit-enemy']:play()
+            goto continue
+        end
+
+        if projectile.y >= ((MAP_HEIGHT * TILE_SIZE) - (TILE_SIZE * 0.5)) then
+            projectile.state = 'broken'
+            gSounds['hit-enemy']:play()
+            goto continue
+        end
+        ::continue::
+    end
+
     for i = #self.objects, 1, -1 do
         local object = self.objects[i]
 
@@ -207,6 +298,9 @@ function Room:update(dt)
             object:onCollide()
             if object.type == 'heart' then
                 table.remove(self.objects, i)
+            end
+            if object.solid == true then
+                self.player:adjustSolidCollision(object)
             end
         end
     end
@@ -234,6 +328,10 @@ function Room:render()
 
     for k, entity in pairs(self.entities) do
         if not entity.dead then entity:render(self.adjacentOffsetX, self.adjacentOffsetY) end
+    end
+
+    for k, projectile in pairs(self.projectiles) do
+        projectile:render(self.adjacentOffsetX, self.adjacentOffsetY)
     end
 
     -- stencil out the door arches so it looks like the player is going through
