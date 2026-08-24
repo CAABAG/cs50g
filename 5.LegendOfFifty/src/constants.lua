@@ -21,6 +21,7 @@ TILE_SIZE = 16
 --
 PLAYER_WALK_SPEED = 60
 POT_FLY_SPEED = 80
+POT_SECONDS_TO_BREAK = 0.2
 
 --
 -- map constants

@@ -238,6 +238,10 @@ function Room:update(dt)
     for i = #self.projectiles, 1, -1 do
         local projectile = self.projectiles[i]
         projectile:update(dt)
+        if projectile.secondsBroken >= POT_SECONDS_TO_BREAK then
+            table.remove(self.projectiles, i)
+            goto continue
+        end
 
         for j = #self.entities, 1, -1 do
             if self.entities[j]:collides(projectile) then
@@ -245,6 +249,7 @@ function Room:update(dt)
                 print('oof')
             end
         end
+        ::continue::
     end
 
     for i = #self.objects, 1, -1 do
