@@ -37,10 +37,10 @@ function Projectile:init(def, x, y, direction)
         self.thresholdY = self.y
     elseif self.direction == 'up' then
         self.thresholdX = self.x
-        self.thresholdY = self.y - (self.thresholdY * TILE_SIZE)
+        self.thresholdY = self.y - (self.threshold * TILE_SIZE)
     elseif self.direction == 'down' then
         self.thresholdX = self.x
-        self.thresholdY = self.y + (self.thresholdY * TILE_SIZE)
+        self.thresholdY = self.y + (self.threshold * TILE_SIZE)
     end
 end
 
